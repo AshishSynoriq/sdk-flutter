@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:hypertrack_plugin/hypertrack_platform_interface.dart';
 
 import 'const/constants.dart';
@@ -55,19 +56,23 @@ class HyperTrack {
   void setDeviceMetadata(Map<String, Object> data) =>
       _pluginInterface.setDeviceMetadata(data);
 
-  void enableDebugLogging() async => _pluginInterface.enableDebugLogging();
+  /// Enable debugging.
+  void enableDebugLogging() async {
+    const MethodChannel('sdk.hypertrack.com/handle')
+        .invokeMethod('enableDebugLogging');
+  }
 
   /// Triggers tracking start.
   ///
   /// This isn't always result in SDK tracking, as missing permissions or disabled
   /// geolocation sensors could lead to a tracking outage. Use [onTrackingStateChanged]
   /// stream to get the actual state details.
-  startTracking() async {
+  start() async {
     await _pluginInterface.startTracking();
   }
 
   /// Stops tracking.
-  stopTracking() async {
+  stop() async {
     await _pluginInterface.stopTracking();
   }
 
@@ -91,5 +96,6 @@ class HyperTrack {
     return _pluginInterface.isRunningStatus;
   }
 
-  Stream<TrackingStateChange> get onTrackingStateChanged => _pluginInterface.onTrackingStateChanged;
+  Stream<TrackingStateChange> get onTrackingStateChanged =>
+      _pluginInterface.onTrackingStateChanged;
 }
