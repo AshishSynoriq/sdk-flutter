@@ -110,5 +110,8 @@ String getTrackingStatus (TrackingStateChange event) {
     TrackingStateChange.locationDisabled: "Location Disabled",
     TrackingStateChange.permissionsDenied: "Permissions Denied",
   };
-  return statusMap[event] ?? "Dikkat";
+  if (statusMap[event] == null) {
+    throw Exception("Unexpected null value in getTrackingStatus");
+  }
+  return statusMap[event]!;
 }
