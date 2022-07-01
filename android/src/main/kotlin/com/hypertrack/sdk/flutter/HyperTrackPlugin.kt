@@ -56,16 +56,19 @@ public class HyperTrackPlugin(): FlutterPlugin, MethodCallHandler, StreamHandler
     private const val HYPERTRACK_SDK_METHOD_CHANNEL = "sdk.hypertrack.com/handle"
     private const val HYPERTRACK_SDK_STATE_CHANNEL = "sdk.hypertrack.com/trackingState"
 
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      Log.i(TAG, "registerWith")
+    // Dont need to register plugins in Android embedding v2
+    // @JvmStatic
+    // fun registerWith(registrar: Registrar) {
+    //   Log.i(TAG, "registerWith")
 
-      val context = registrar.activity()?.applicationContext
-      val messenger = registrar.messenger()
-      HyperTrackPlugin().onAttachedToEngine(context, messenger)
-    }
-  }
-
+    //   registrar.activity()?.applicationContext?.let { context -> 
+    //     val messenger = registrar.messenger()
+    //     HyperTrackPlugin().onAttachedToEngine(context, messenger)
+    //   } ?: run {
+    //     Log.i(TAG, "failedRegister")
+    //   }
+    // }
+  }  
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "initialize") {
       initialize(call.arguments(), result)
@@ -77,7 +80,7 @@ public class HyperTrackPlugin(): FlutterPlugin, MethodCallHandler, StreamHandler
 
     val sdk = sdkInstance
     if (sdk == null) {
-      result.error("NOT_INITIALIZED", "Sdk wasn't initialized", null)
+      result.error("NOT_INITIALIZED", "Internal Error: onMethodCall(${call.method}) - sdkInstance is null", null)
       return
     }
 
@@ -86,15 +89,14 @@ public class HyperTrackPlugin(): FlutterPlugin, MethodCallHandler, StreamHandler
       "isRunning" -> result.success(sdk.isRunning)
       "start" -> start(result, sdk)
       "stop" -> stop(result, sdk)
-      "addGeotag" -> addGeotag(call.arguments(), result, sdk)
+      "addGeotag" -> addGeotag(call.arguments()!!, result, sdk)
       "allowMockLocations" -> allowMockLocations(result, sdk)
-      "setDeviceName" -> setDeviceName(call.arguments(), result, sdk)
-      "setDeviceMetadata" -> setDeviceMetadata(call.arguments()!!, result, sdk)
+      "setDeviceName" -> setDeviceName(call.arguments()!!, result, sdk) 
+      "setDeviceMetadata" -> setDeviceName(call.arguments()!!, result, sdk)
       "syncDeviceSettings" -> syncDeviceSettings(result, sdk)
       else -> result.notImplemented()
 
     }
-
   }
 
   private var sdkInstance : HyperTrack? = null
@@ -232,4 +234,3 @@ public class HyperTrackPlugin(): FlutterPlugin, MethodCallHandler, StreamHandler
     stateListener = null
   }
 }
-
